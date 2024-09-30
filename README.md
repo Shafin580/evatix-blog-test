@@ -1,0 +1,1 @@
+# evatix-blog-test
