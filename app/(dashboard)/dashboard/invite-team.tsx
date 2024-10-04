@@ -50,18 +50,22 @@ export function InviteTeamMember() {
           <div>
             <Label>Role</Label>
             <RadioGroup
-              defaultValue="member"
+              defaultValue="user"
               name="role"
               className="flex space-x-4"
               disabled={!isOwner}
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="member" id="member" />
-                <Label htmlFor="member">Member</Label>
+                <RadioGroupItem value="user" id="user" />
+                <Label htmlFor="user">User</Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="owner" id="owner" />
-                <Label htmlFor="owner">Owner</Label>
+                <RadioGroupItem value="author" id="author" />
+                <Label htmlFor="author">Author</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="admin" id="admin" />
+                <Label htmlFor="admin">Admin</Label>
               </div>
             </RadioGroup>
           </div>
