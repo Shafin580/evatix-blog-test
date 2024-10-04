@@ -1,7 +1,6 @@
 "use client"
 
 import { Fragment, useEffect, useId, useRef, useState } from "react"
-import variables from "@variables/variables.module.scss"
 import { TSortProps, TablePagyLiteProps } from "../TablePagyLite.Client"
 import Button from "@/components/Button"
 import ButtonIcon from "@/components/ButtonIcon"
@@ -115,7 +114,7 @@ const FlyoutMenu = ({ sortProps, columnHeader, onSort, onFilter }: FlyoutMenuPro
               iconName="dots-vertical"
               iconSize="17"
               className="btn-icon !mr-5 flex items-center justify-center"
-              iconColor={variables.gray300}
+              iconColor="stroke-gray-300"
               clicked={() => setIsFlyoutOpen(!isFlyoutOpen)}
             />
           </Fragment>,

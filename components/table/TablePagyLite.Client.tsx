@@ -10,7 +10,6 @@ import {
   TableRow,
 } from "./components/table"
 
-import variables from "@variables/variables.module.scss"
 import Link from "next/link"
 import { QueryKey, UndefinedInitialDataOptions, useQuery } from "@tanstack/react-query"
 import { MRT_ColumnDef } from "material-react-table"
@@ -679,7 +678,7 @@ export function TablePagyLite<TDataRecord extends Record<string, any>>({
                 <ButtonIcon
                   iconName="chevron-left"
                   className="btn-icon"
-                  iconColor={variables.gray400}
+                  iconColor="stroke-gray-400"
                   clicked={() => {
                     setPagination((prev) => ({ ...prev, pageIndex: prev.pageIndex - 1 }))
                   }}
@@ -688,7 +687,7 @@ export function TablePagyLite<TDataRecord extends Record<string, any>>({
                 <ButtonIcon
                   iconName="chevron-right"
                   className="btn-icon"
-                  iconColor={variables.gray400}
+                  iconColor="stroke-gray-400"
                   clicked={() => {
                     setPagination((prev) => ({ ...prev, pageIndex: prev.pageIndex + 1 }))
                   }}
