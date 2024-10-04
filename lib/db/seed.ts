@@ -47,10 +47,25 @@ async function seed() {
   const [user] = await db
     .insert(users)
     .values([
+      // {
+      //   email: email,
+      //   passwordHash: passwordHash,
+      //   role: "owner",
+      // },
       {
-        email: email,
+        email: "author@test.com",
         passwordHash: passwordHash,
-        role: "owner",
+        role: "author",
+      },
+      {
+        email: "admin@test.com",
+        passwordHash: passwordHash,
+        role: "admin",
+      },
+      {
+        email: "user@test.com",
+        passwordHash: passwordHash,
+        role: "user",
       },
     ])
     .returning();
