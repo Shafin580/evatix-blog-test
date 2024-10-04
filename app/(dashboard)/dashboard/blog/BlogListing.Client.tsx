@@ -3,14 +3,21 @@
 import Button from "@/components/Button";
 import ButtonIcon from "@/components/ButtonIcon";
 import Icon from "@/components/Icon";
+import ModalBlank from "@/components/ModalBlank";
 import { TablePagyLite } from "@/components/table/TablePagyLite.Client";
 import { useUser } from "@/lib/auth";
 import { LINKS } from "@/router.config";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import BlogCreateUpdateModal from "./BlogCreateUpdateModal";
 
 const BlogListing = () => {
   const { user } = useUser();
+  const [selectedBlog, setSelectedBlog] = useState<BlogItemProps | null>(null);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [showCreateUpdateBlogModal, setShowCreateUpdateBlogModal] =
+    useState(false);
   const token = "";
   return (
     <div>
@@ -54,7 +61,7 @@ const BlogListing = () => {
             className: "text-center",
             Cell: ({ featureImage, slug }) => (
               <div className="flex justify-center">
-                <Image alt={slug} src={featureImage} />
+                <Image alt={slug!} src={featureImage!} />
               </div>
             ),
           },
@@ -74,7 +81,11 @@ const BlogListing = () => {
                     iconClassName="transition-colors hover:stroke-gray-500"
                     clicked={() => {
                       console.log("Edit", data);
+                      setIsUpdate(true);
+                      setSelectedBlog(data);
+                      setShowCreateUpdateBlogModal(true);
                     }}
+                    isDisabled={user?.role == "user" ? true : false}
                   />
                   <ButtonIcon
                     iconName="copy-05"
@@ -89,6 +100,11 @@ const BlogListing = () => {
                     clicked={() => {
                       console.log("Trash", data);
                     }}
+                    isDisabled={
+                      user?.role == "user" || user?.role == "author"
+                        ? true
+                        : false
+                    }
                   />
                 </div>
               </>
@@ -112,6 +128,21 @@ const BlogListing = () => {
         //   queryKey: ["page"],
         // }}
       />
+      {showCreateUpdateBlogModal == false && (
+        <ModalBlank
+          modalSize="md"
+          crossBtnClassName="top-2 right-2 p-2"
+          onCloseModal={(e: any) => {
+            setShowCreateUpdateBlogModal(false);
+            setIsUpdate(false);
+          }}
+          className="space-y-0 !bg-secondary p-8 sm:p-8"
+          showCrossButton
+          onClickOutToClose={false}
+        >
+          <BlogCreateUpdateModal isUpdate={isUpdate} blogData={selectedBlog} />
+        </ModalBlank>
+      )}
     </div>
   );
 };
