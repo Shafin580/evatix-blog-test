@@ -5,7 +5,13 @@
     "slug": "understanding-javascript-closures",
     "content": "In this blog, we will explore the concept of closures in JavaScript and how they work. Closures are an essential part of JavaScript programming and are often used in various contexts...",
     "featureImage": "https://example.com/images/js-closures.png",
-    "state": "published"
+    "state": "published",
+    "tags": [
+      "JavaScript",
+      "Closures",
+      "Programming"
+    ],
+    "userId": 1
   },
   {
     "id": 2,
@@ -13,7 +19,13 @@
     "slug": "getting-started-with-next-js",
     "content": "Next.js is a powerful React framework for building server-side rendered applications. In this blog post, we will cover the basics of Next.js and walk through the steps of creating your first app...",
     "featureImage": "https://example.com/images/nextjs-intro.png",
-    "state": "draft"
+    "state": "draft",
+    "tags": [
+      "JavaScript",
+      "Closures",
+      "Programming"
+    ],
+    "userId": 1
   },
   {
     "id": 3,
@@ -21,7 +33,13 @@
     "slug": "comprehensive-guide-to-python-decorators",
     "content": "Decorators provide a way to modify the behavior of a function or class. In this post, we'll deep dive into how decorators work in Python, along with practical examples...",
     "featureImage": "https://example.com/images/python-decorators.png",
-    "state": "published"
+    "state": "published",
+    "tags": [
+      "JavaScript",
+      "Closures",
+      "Programming"
+    ],
+    "userId": 1
   },
   {
     "id": 4,
@@ -29,6 +47,12 @@
     "slug": "mastering-docker-for-developers",
     "content": "Docker is a tool designed to make it easier to create, deploy, and run applications by using containers. This guide will help you master Docker and its key concepts...",
     "featureImage": "https://example.com/images/docker-guide.png",
-    "state": "archived"
+    "state": "archived",
+    "tags": [
+      "JavaScript",
+      "Closures",
+      "Programming"
+    ],
+    "userId": 1
   }
 ]
