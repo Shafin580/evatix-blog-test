@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   experimental: {
     ppr: true,
   },
+  images: {
+    domains: ['example.com',  'localhost'],
+
+  },
 };
 
 export default nextConfig;

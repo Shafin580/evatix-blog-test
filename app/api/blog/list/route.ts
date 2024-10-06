@@ -4,9 +4,9 @@ import { blogs } from "@/lib/db/schema"
 import { eq, ilike, and, desc, asc, sql, count, AnyColumn } from "drizzle-orm"
 import {
 	paginationHandler,
-	responseHandler,
 	responsePaginationHandler,
-} from "@/lib/utils"
+} from "@/lib/utils/pagination-handler"
+import { responseHandler } from "@/lib/utils/response-handler"
 
 export async function GET(req: NextRequest) {
 	try {
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
 		const {
 			searchText,
 			tags,
-			state,
+			state='published',
 			sort = "createdAt",
 			order = "desc",
 		} = Object.fromEntries(new URL(req.url).searchParams)

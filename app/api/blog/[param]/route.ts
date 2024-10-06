@@ -2,9 +2,12 @@ import { NextRequest } from "next/server"
 import { db } from "@/lib/db/drizzle"
 import { blogs } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
-import { responseHandler } from "@/lib/utils"
+import { responseHandler } from "@/lib/utils/response-handler"
 
-export async function GET(req: NextRequest, { params }: { params: { param: string } }) {
+export async function GET(
+	req: NextRequest,
+	{ params }: { params: { param: string } }
+) {
 	try {
 		const { param } = params
 
@@ -22,7 +25,7 @@ export async function GET(req: NextRequest, { params }: { params: { param: strin
 		if (blog.length === 0) {
 			return responseHandler({
 				status: 404,
-        error: "Not Found",
+				error: "Not Found",
 				message: "Blog not found",
 			})
 		}

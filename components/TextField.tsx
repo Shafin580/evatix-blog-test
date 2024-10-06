@@ -663,9 +663,9 @@ const TextField = ({
             className={cn(
               "!leading-loose",
               isRounded == true && "!rounded-md",
-              fieldHeight == "sm" && "h-36",
-              fieldHeight == "md" && "h-44",
-              fieldHeight == "lg" && "h-52"
+              fieldHeight == "sm" && "h-8",
+              fieldHeight == "md" && "h-10",
+              fieldHeight == "lg" && "h-12"
             )}
           />
         ) : (
@@ -715,11 +715,11 @@ const TextField = ({
                 ? " border-red-300 ring-red-300 focus-within:border-red-500 focus-within:ring-red-500"
                 : "border-slate-200 ring-slate-200 focus-within:border-primary-500 focus-within:ring-primary-500 focus:outline-none focus:ring-0",
 
-              isLeftIconValid() ? "pl-36" : "pl-12",
-              isRightIconValid() ? "pr-36" : "pr-8",
-              fieldHeight == "sm" && "h-36",
-              fieldHeight == "md" && "h-44",
-              fieldHeight == "lg" && "h-52",
+              isLeftIconValid() ? "pl-6" : "pl-2",
+              isRightIconValid() ? "pr-6" : "pr-4",
+              fieldHeight == "sm" && "h-8",
+              fieldHeight == "md" && "h-10",
+              fieldHeight == "lg" && "h-12",
 
               isDisabled ? "!bg-slate-200 opacity-50 hover:hover:cursor-not-allowed" : "",
               className

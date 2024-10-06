@@ -142,14 +142,14 @@ export function TablePagyLite<TDataRecord extends Record<string, any>>({
   onRowClick,
   onRowClickHref,
 }: TablePagyLiteProps<TDataRecord>) {
-  const tCellCommonClassList = "ml-10 mr-5"
+  const tCellCommonClassList = "ml-2 mr-1"
   const tHeadClassList = cn(
     tCellCommonClassList,
-    "flex justify-between items-center h-10 text-left align-middle my-8 text-slate-500 h-max me-3 select-none space-x-8"
+    "flex justify-between items-center h-3 text-left align-middle my-2 text-slate-500 h-max me-2 select-none space-x-2"
   )
   const tCellClassList = cn(
     tCellCommonClassList,
-    "inline-block text-left align-middle py-10 text-base text-slate-800"
+    "inline-block text-left align-middle py-2 text-base text-slate-800"
   )
   const defaultColumnSize: CSSProperties = { minWidth: 180, maxWidth: 1000, width: "auto" }
   const rowsPerPageGeneratedOptions = (arr: NonNullable<typeof rowsPerPageOptions>) =>
@@ -480,7 +480,7 @@ export function TablePagyLite<TDataRecord extends Record<string, any>>({
                   {/* // - vertical divider */}
                   <span
                     className={cn(
-                      "mx-5 h-24 max-h-40 min-h-10 touch-none select-none rounded-[2px] border-[2px] border-black/[0.12]",
+                      "mx-5 h-4 max-h-40 min-h-10 touch-none select-none rounded-[2px] border-[2px] border-black/[0.12]",
                       index === memoizedColumnHeaders.length - 1 && "hidden"
                     )}
                   />
@@ -622,7 +622,7 @@ export function TablePagyLite<TDataRecord extends Record<string, any>>({
             <div className="loading-bar !animate-duration-[1.4s]"></div>
           </div>
         )}
-        <div className="flex items-center justify-end gap-20 p-8">
+        <div className="flex items-center justify-end gap-2 p-1">
           {enablePagination && (
             <>
               <span className="text-sm text-slate-500">Rows per page</span>
@@ -630,16 +630,16 @@ export function TablePagyLite<TDataRecord extends Record<string, any>>({
                 selectSingleProps={{
                   className: "bg-transparent border-none text-slate-800 text-sm",
                   classNames: {
-                    container: () => cn("!-ml-28 w-60"),
+                    container: () => cn("!-ml-40 w-10"),
                     control: () => cn("!border-none !bg-transparent text-right !shadow-none"),
                   },
                   components: {
                     IndicatorSeparator: () => null,
                     DropdownIndicator: () => (
                       <svg
-                        width={18}
-                        height={18}
-                        className="-mx-8 fill-slate-500"
+                        width={20}
+                        height={20}
+                        className="-mx-10 fill-slate-500"
                         fill="currentColor"
                         clipRule="evenodd"
                         fillRule="evenodd"

@@ -253,9 +253,9 @@ const Button = memo(function Button({
 
     //=> Sizes
     {
-      "h-28 px-12 text-sm": size === "sm",
-      "h-44 px-16 text-sm md:text-base": size === "md",
-      "h-52 px-24 text-sm md:text-base": size === "lg",
+      "h-8 px-12 text-sm": size === "sm",
+      "h-10 px-16 text-sm md:text-base": size === "md",
+      "h-12 px-24 text-sm md:text-base": size === "lg",
     },
 
     //=> When Not Disabled

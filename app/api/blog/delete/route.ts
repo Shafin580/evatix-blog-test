@@ -1,11 +1,27 @@
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db/drizzle"
-import { blogs } from "@/lib/db/schema"
+import { ActivityType, blogs, users } from "@/lib/db/schema"
 import { eq } from "drizzle-orm"
-import { responseHandler } from "@/lib/utils"
+import { logActivity } from "@/app/(login)/actions"
+import { responseHandler } from "@/lib/utils/response-handler"
+import { getUserInfo } from "@/lib/utils/get-user-info"
 
 export async function DELETE(req: NextRequest) {
 	try {
+		const userWithTeam = await getUserInfo()
+
+		if (userWithTeam instanceof NextResponse) {
+			return userWithTeam
+		}
+
+		if (userWithTeam.user.role !== "admin") {
+			return responseHandler({
+				status: 403,
+				error: "Forbidden",
+				message: "Forbidden access",
+			})
+		}
+
 		// Extract blog ID from the URL query parameters
 		const { searchParams } = new URL(req.url)
 		const blogId = searchParams.get("id")
@@ -34,6 +50,15 @@ export async function DELETE(req: NextRequest) {
 				message: "Blog not found or already deleted",
 			})
 		}
+
+		// Log the activity
+		await logActivity(
+			userWithTeam.teamId,
+			userWithTeam.user.id,
+			ActivityType.DELETE_BLOG,
+			(req.headers.get("X-Forwarded-For") || req.headers.get("x-real-ip")) ??
+				undefined
+		)
 
 		// Return a success response if the deletion was successful
 		return responseHandler({

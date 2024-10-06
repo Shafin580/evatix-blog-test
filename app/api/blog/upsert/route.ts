@@ -1,34 +1,81 @@
-import { NextRequest } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/lib/db/drizzle"
-import { blogs } from "@/lib/db/schema"
-import { eq } from "drizzle-orm"
-import { fileSaver, responseHandler, slugGenerator } from "@/lib/utils"
+import { ActivityType, blogs } from "@/lib/db/schema"
+import { desc, eq } from "drizzle-orm"
 import path from "path"
 import { CONSTANTS } from "@/lib/constants"
 import fs from "fs-extra"
+import { logActivity } from "@/app/(login)/actions"
+import { responseHandler } from "@/lib/utils/response-handler"
+import { fileSaver } from "@/lib/utils/file-saver"
+import { slugGenerator } from "@/lib/utils/slug-generator"
+import { getUserInfo } from "@/lib/utils/get-user-info"
 
 export async function POST(req: NextRequest) {
 	try {
+		const userWithTeam = await getUserInfo()
+
+		if (userWithTeam instanceof NextResponse) {
+			return userWithTeam
+		}
+
+		if (userWithTeam.user.role === "user") {
+			return responseHandler({
+				status: 403,
+				error: "Forbidden",
+				message: "Forbidden access",
+			})
+		}
+
 		// Parse the request body
-		const body = await req.json()
+		const body = await req.formData()
+		const formData = Object.fromEntries(body) as {
+			id?: FormDataEntryValue | number
+			title?: FormDataEntryValue | string
+			content?: FormDataEntryValue | string
+			state?: FormDataEntryValue | string
+			featureImage?: FormDataEntryValue | string | File
+			tags?: FormDataEntryValue | string[]
+			userId?: FormDataEntryValue | number
+			publishedAt?: FormDataEntryValue | string | null
+		}
+
 		let {
 				id,
 				title,
 				content,
 				state = "draft",
-				featureImage,
 				tags,
 				userId,
 				publishedAt,
-			} = body,
-			slug
+			} = formData,
+			slug,
+			featureImage = body.get("featureImage") as File | string
 
 		// trim the string fields
-		title = title.trim()
-		content = content.trim()
-		state = state.trim()
-		featureImage = featureImage.trim()
-		tags = tags.map((tag: string) => tag.trim())
+		id = id ? Number(id.toString().trim()) : undefined
+		title = title ? title.toString().trim() : ""
+		content = content ? content.toString().trim() : ""
+		state = state ? state.toString().trim() : ""
+		tags = tags
+			? tags
+					.toString()
+					.split(",")
+					.map((tag: string) => tag.trim())
+			: undefined
+		userId = userId ? Number((userId as string).trim()) : 1 // ! change this to undefined
+
+		console.log(
+			__dirname,
+			id,
+			title,
+			content,
+			state,
+			featureImage,
+			tags,
+			userId,
+			publishedAt
+		)
 
 		// + If an ID is provided, update the existing blog
 		if (id) {
@@ -45,7 +92,7 @@ export async function POST(req: NextRequest) {
 			}
 
 			const tempSlug = slugGenerator(title)
-			const existingSlug = existingBlog.slug
+			const existingSlug = existingBlog.slug === tempSlug
 
 			if (existingBlog.title !== title) {
 				slug = existingSlug ? slugGenerator(title, true) : tempSlug
@@ -56,7 +103,7 @@ export async function POST(req: NextRequest) {
 				const fullPath = path.join(
 					process.cwd(),
 					CONSTANTS.resource_path,
-					featureImage
+					existingBlog.featureImage
 				)
 				if (fs.existsSync(fullPath)) {
 					fs.unlinkSync(fullPath)
@@ -64,11 +111,11 @@ export async function POST(req: NextRequest) {
 
 				// Save new image if provided
 				const savedFilePaths = await fileSaver(
-					featureImage,
+					featureImage as File,
 					"./" +
 						path.join(
 							CONSTANTS.resource_path,
-							userId.toString(),
+							userId!.toString(),
 							existingBlog.id.toString()
 						)
 				)
@@ -85,7 +132,7 @@ export async function POST(req: NextRequest) {
 					featureImage: featureImage || existingBlog.featureImage,
 					tags: tags || existingBlog.tags,
 					updatedAt: new Date(), // Update timestamp
-					publishedAt: state === "published" ? new Date(publishedAt) : null,
+					publishedAt: state === "published" ? new Date() : null,
 				})
 				.where(eq(blogs.id, id))
 				.returning()
@@ -99,6 +146,15 @@ export async function POST(req: NextRequest) {
 				})
 			}
 
+			// Log the activity
+			await logActivity(
+				userWithTeam.teamId,
+				userWithTeam.user.id,
+				ActivityType.UPDATE_BLOG,
+				(req.headers.get("X-Forwarded-For") || req.headers.get("x-real-ip")) ??
+					undefined
+			)
+
 			// Return the updated blog
 			return responseHandler({
 				status: 200,
@@ -109,7 +165,7 @@ export async function POST(req: NextRequest) {
 
 		// + New blog creation logic
 
-		if (!title || !slug || !content || !featureImage || !tags || !userId) {
+		if (!title || !content || !featureImage || !tags) {
 			return responseHandler({
 				status: 400,
 				error: "Bad Request",
@@ -118,36 +174,48 @@ export async function POST(req: NextRequest) {
 		}
 
 		// Check if the slug already exists
-		const existingSlug = (await db
-			.select({
-				slug: blogs.slug,
-			})
-			.from(blogs)
-			.where(eq(blogs.slug, slug))
-			.limit(1))?.[0]?.slug
+		const tempSlug = slugGenerator(title)
+		const existingSlug = (
+			await db
+				.select({
+					slug: blogs.slug,
+				})
+				.from(blogs)
+				.where(eq(blogs.slug, tempSlug))
+				.limit(1)
+		)?.[0]?.slug
+
+		const latestBlogId = (
+			await db
+				.select({ id: blogs.id })
+				.from(blogs)
+				.orderBy(desc(blogs.id))
+				.limit(1)
+		)?.[0].id
 
 		// If no ID is provided, create a new blog
 		const newBlog = (
 			await db
 				.insert(blogs)
 				.values({
+					id: latestBlogId ? latestBlogId + 1 : 1,
 					title,
-					slug: existingSlug ? slugGenerator(title, true) : slug,
+					slug: existingSlug ? slugGenerator(title, true) : tempSlug,
 					content,
-					state,
-					featureImage,
+					state: "draft",
+					featureImage: featureImage as string,
 					tags,
 					userId,
 					createdAt: new Date(),
 					updatedAt: new Date(),
-					publishedAt: state === "published" ? new Date(publishedAt) : null,
+					publishedAt: null,
 				})
 				.returning()
 		)[0]
 
 		//  Save images
 		const savedFilePaths = await fileSaver(
-			featureImage,
+			featureImage as File,
 			"./" +
 				path.join(
 					CONSTANTS.resource_path,
@@ -165,6 +233,15 @@ export async function POST(req: NextRequest) {
 				.where(eq(blogs.id, newBlog.id))
 				.returning()
 		)[0]
+
+		// Log the activity
+		await logActivity(
+			userWithTeam.teamId,
+			userWithTeam.user.id,
+			ActivityType.CREATE_BLOG,
+			(req.headers.get("X-Forwarded-For") || req.headers.get("x-real-ip")) ??
+				undefined
+		)
 
 		// Return the newly created blog
 		return responseHandler({

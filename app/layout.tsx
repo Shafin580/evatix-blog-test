@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope } from "next/font/google";
 import { UserProvider } from "@/lib/auth";
 import { getUser } from "@/lib/db/queries";
-import TanStackQueryProviders from "@/TanStackQuery.Provider";
+import TanStackQueryProviders from "@/lib/providers/TanStackQuery.Provider";
 
 export const metadata: Metadata = {
   title: "Next.js SaaS Starter",

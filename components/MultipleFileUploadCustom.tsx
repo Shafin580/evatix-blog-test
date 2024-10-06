@@ -220,7 +220,7 @@ const MultipleFileUploadCustom = function ({
     >
       <div
         className={cn(
-          "mx-auto mt-10 grid grid-cols-3 justify-center gap-4 px-4",
+          "mx-auto mt-3 grid grid-cols-3 justify-center gap-4 px-4",
           {
             "max-w-xs": previewSize == "xs",
             "max-w-sm": previewSize == "sm",
@@ -262,7 +262,7 @@ const MultipleFileUploadCustom = function ({
                     <div
                       className={cn(
                         "absolute left-4 top-4 flex aspect-square items-center justify-center rounded-full bg-emerald-500 shadow-md",
-                        index == 0 ? "w-28" : "w-24"
+                        index == 0 ? "w-3" : "w-2"
                       )}
                     >
                       <span className="font-mono text-sm text-white">
@@ -323,7 +323,7 @@ const MultipleFileUploadCustom = function ({
       />
       <Button
         clicked={handleClick}
-        className="formBtnWrapper d-flex justify-content-center -ml-3 h-20 bg-green-700 text-white"
+        className="formBtnWrapper d-flex justify-content-center -ml-3 h-8 bg-green-700 text-white"
         variant="primary"
         btnText={btnText}
         size="sm"

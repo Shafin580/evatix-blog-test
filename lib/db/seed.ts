@@ -39,7 +39,7 @@ async function createStripeProducts() {
 	console.log("Stripe products and prices created successfully.")
 }
 
-async function createBlogItems() {
+async function createBlogItems(userId: number) {
 	await db
 		.insert(blogs)
 		.values([
@@ -51,8 +51,8 @@ async function createBlogItems() {
 					"In this blog, we will explore the concept of closures in JavaScript and how they work. Closures are an essential part of JavaScript programming and are often used in various contexts...",
 				featureImage: "https://example.com/images/js-closures.png",
 				state: "published",
-				tags: ["JavaScript", "Closures", "Programming"],
-				userId: 1,
+				tags: ["python", "PHP", "software"],
+				userId: userId,
 			},
 			{
 				id: 2,
@@ -62,8 +62,8 @@ async function createBlogItems() {
 					"Next.js is a powerful React framework for building server-side rendered applications. In this blog post, we will cover the basics of Next.js and walk through the steps of creating your first app...",
 				featureImage: "https://example.com/images/nextjs-intro.png",
 				state: "draft",
-				tags: ["JavaScript", "Closures", "Programming"],
-				userId: 1,
+				tags: ["c++", "spring boot", "laravel"],
+				userId: userId,
 			},
 			{
 				id: 3,
@@ -73,8 +73,8 @@ async function createBlogItems() {
 					"Decorators provide a way to modify the behavior of a function or class. In this post, we'll deep dive into how decorators work in Python, along with practical examples...",
 				featureImage: "https://example.com/images/python-decorators.png",
 				state: "published",
-				tags: ["JavaScript", "Closures", "Programming"],
-				userId: 1,
+				tags: ["Bangladesh", "nextjs", "reactjs"],
+				userId: userId,
 			},
 			{
 				id: 4,
@@ -84,62 +84,65 @@ async function createBlogItems() {
 					"Docker is a tool designed to make it easier to create, deploy, and run applications by using containers. This guide will help you master Docker and its key concepts...",
 				featureImage: "https://example.com/images/docker-guide.png",
 				state: "archived",
-				tags: ["JavaScript", "Closures", "Programming"],
-				userId: 1,
+				tags: ["Philips", "Closures", "Programming"],
+				userId: userId,
 			},
 		])
 
-	console.log("Initial blogs created.")
+	console.log("Initial blogs created successfully.")
 }
 
 async function seed() {
-	// const email = "test@test.com"
-	// const password = "admin123"
-	// const passwordHash = await hashPassword(password)
+	const email = "test@test.com"
+	const password = "admin123"
+	const passwordHash = await hashPassword(password)
 
-	// const [user] = await db
-	// 	.insert(users)
-	// 	.values([
-	// 		{
-	// 			email: email,
-	// 			passwordHash: passwordHash,
-	// 			role: "admin",
-	// 		},
-	// 		{
-	// 			email: "author@test.com",
-	// 			passwordHash: passwordHash,
-	// 			role: "author",
-	// 		},
-	// 		{
-	// 			email: "admin@test.com",
-	// 			passwordHash: passwordHash,
-	// 			role: "admin",
-	// 		},
-	// 		{
-	// 			email: "user@test.com",
-	// 			passwordHash: passwordHash,
-	// 			role: "user",
-	// 		},
-	// 	])
-	// 	.returning()
+	const userMembers = await db
+		.insert(users)
+		.values([
+			{
+				email: email,
+				passwordHash: passwordHash,
+				role: "admin",
+			},
+			{
+				email: "author@gmail123.com",
+				passwordHash: passwordHash,
+				role: "author",
+			},
+			{
+				email: "admin@gmail123.com",
+				passwordHash: passwordHash,
+				role: "admin",
+			},
+			{
+				email: "user@gmail123.com",
+				passwordHash: passwordHash,
+				role: "user",
+			},
+		])
+		.returning()
 
-	// console.log("Initial user created.")
+	console.log("Initial users created successfully.")
 
-	// const [team] = await db
-	// 	.insert(teams)
-	// 	.values({
-	// 		name: "Test Team",
-	// 	})
-	// 	.returning()
+	const [team] = await db
+		.insert(teams)
+		.values({
+			name: "Test Team",
+		})
+		.returning()
 
-	// await db.insert(teamMembers).values({
-	// 	teamId: team.id,
-	// 	userId: user.id,
-	// 	role: "owner",
-	// })
+	// Assign all users to the team
+const teamMembersToInsert = userMembers.map(user => ({
+	teamId: team.id,
+	userId: user.id,
+	role: user.role, // Assign their respective role in the team
+  }));
+  
+  await db.insert(teamMembers).values(teamMembersToInsert);
 
-	// await createStripeProducts()
-	await createBlogItems()
+	await createStripeProducts()
+	await createBlogItems(userMembers[0].id)
 }
 
 seed()

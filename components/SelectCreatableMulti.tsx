@@ -69,9 +69,9 @@ const SelectCreatableMulti = (props: SelectCreatableMultiProps) => {
         "w-full !rounded-md border !border-slate-200 bg-white text-base font-medium text-slate-700 !hover:border-slate-200 !shadow-none",
         (isDisabled || isError) && "!bg-slate-200 opacity-50 hover:!cursor-not-allowed pointer-events-auto",
         {
-          "!min-h-36": size == "sm",
-          "!min-h-44": size == "md",
-          "!min-h-52": size == "lg",
+          "!min-h-10": size == "sm",
+          "!min-h-12": size == "md",
+          "!min-h-16": size == "lg",
         },
         selectProps.menuIsOpen && "!border-primary-500 dark:focus-within:!border-primary-600",
         isLoading && "hover:cursor-wait",
@@ -88,11 +88,11 @@ const SelectCreatableMulti = (props: SelectCreatableMultiProps) => {
     input: () => cn("!my-auto", isLoading && "!opacity-0 hover:!cursor-wait", csInputClassName),
     indicatorsContainer: () =>
       cn(
-        "min-w-32 flex items-center border-l border-slate-200 my-auto px-4",
+        "min-w-12 flex items-center border-l border-slate-200 my-auto px-4",
         {
-          "h-20": size == "sm",
-          "h-28": size == "md",
-          "h-36": size == "lg",
+          "h-8": size == "sm",
+          "h-12": size == "md",
+          "h-16": size == "lg",
         },
         csIndicatorsContainerClassName
       ),
