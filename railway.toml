@@ -1,8 +1,12 @@
 [phases.setup]
 nixPkgs = ['...', 'pnpm']
+[phases.install]
+cmds = ["npm install -g corepack", "corepack enable", "corepack prepare pnpm@9.1.0 --activate", "pnpm install"]
 
 [phases.build]
 cmds = ['pnpm install']
+
+
 
 [start]
 cmd = 'pnpm run start'
