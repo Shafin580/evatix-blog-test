@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 				id,
 				title,
 				content,
-				state = "draft",
+				state = "published",
 				tags,
 				userId,
 				publishedAt,
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
 		id = id ? Number(id.toString().trim()) : undefined
 		title = title ? title.toString().trim() : ""
 		content = content ? content.toString().trim() : ""
-		state = state ? state.toString().trim() : ""
+		state = state ? state.toString().trim() : "published"
 		tags = tags
 			? tags
 					.toString()

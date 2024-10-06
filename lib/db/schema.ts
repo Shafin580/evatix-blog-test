@@ -73,7 +73,7 @@ export const blogs = pgTable("blogs", {
 	title: varchar("title", { length: 255 }).notNull(),
 	slug: text("slug").notNull().unique(),
 	content: text("content").notNull(),
-	state: varchar("state", { length: 50 }).notNull().default("draft"), // 'published', 'draft', etc.
+	state: varchar("state", { length: 50 }).notNull().default("published"), // 'published', 'draft', etc.
 	featureImage: text("feature_image").notNull(), // URL to the feature image
 	tags: varchar("tags", { length: 255 }).array().notNull(), // Store multiple tags
 	userId: integer("user_id").references(() => users.id), // Reference to the user (author)

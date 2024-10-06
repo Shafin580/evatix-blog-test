@@ -1,0 +1,1 @@
+ALTER TABLE "blogs" ALTER COLUMN "state" SET DEFAULT 'published';

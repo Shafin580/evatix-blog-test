@@ -3,42 +3,23 @@ import { getAPIResponse } from "./utils/get-api-response";
 
 const basePath = String(process.env.NEXT_PUBLIC_BASE_URL);
 
+// + Function To Fetch Image Data
+export const fetchImageData = async (imageSrc: string, imageName: string): Promise<File> => {
+  try {
+    const response = await fetch(imageSrc)
+    const blob = await response.blob()
+    const file = new File([blob], imageName, { type: blob.type })
+    // return URL.createObjectURL(blob)
+    return file
+  } catch (error) {
+    const file = new File([], "")
+    console.error("Error fetching image data:", error)
+    return file
+  }
+}
+
 // Function to create or update a blog
-export const createUpdateBlog = async ({
-  id,
-  content,
-  featureImage,
-  tags,
-  title,
-  userId,
-  state = "published",
-}: {
-  id?: number;
-  title: string;
-  content: string;
-  state?: string;
-  featureImage: File;
-  tags: string[];
-  userId: number;
-}) => {
-  const data = id
-    ? {
-        id: id,
-        title: title,
-        content: content,
-        state: state,
-        featureImage: featureImage,
-        tags: tags,
-        userId: userId,
-      }
-    : {
-        title: title,
-        content: content,
-        state: state,
-        featureImage: featureImage,
-        tags: tags,
-        userId: userId,
-      };
+export const createUpdateBlog = async (data: any) => {
   const response = await getAPIResponse({
     basePath: basePath,
     apiPath: PATHS.BLOG.CREATE_UPDATE().root,

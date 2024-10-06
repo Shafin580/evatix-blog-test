@@ -146,7 +146,25 @@ const BlogListing = () => {
             className: "text-center",
             Cell: ({ featureImage, slug }) => (
               <div className="flex justify-center">
-                <Image alt={slug!} src={String(featureImage)} width={50} height={50} />
+                <Image
+                  alt={slug!}
+                  src={
+                    "http://localhost:3000/api/uploads?resource=" +
+                    String(featureImage)
+                  }
+                  width={50}
+                  height={50}
+                />
+              </div>
+            ),
+          },
+          {
+            header: "Tags",
+            Cell: (data) => (
+              <div>
+                {data.tags?.map((tag, index) => {
+                  return <span key={index}>{tag + ", "}</span>;
+                })}
               </div>
             ),
           },
@@ -161,13 +179,13 @@ const BlogListing = () => {
             Cell: (data) => (
               <>
                 <div className="flex justify-center space-x-4">
-                  <ButtonIcon
+                  {/* <ButtonIcon
                     iconName="eye"
                     iconClassName="transition-colors hover:stroke-gray-500"
                     clicked={() => {
                       console.log("View", data);
                     }}
-                  />
+                  /> */}
                   <ButtonIcon
                     iconName="edit-05"
                     iconClassName="transition-colors hover:stroke-gray-500"

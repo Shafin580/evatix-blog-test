@@ -1,11 +1,12 @@
 "use client";
 
 import Button from "@/components/Button";
+import ErrorText from "@/components/ErrorText";
 import MultipleFileUploadCustom from "@/components/MultipleFileUploadCustom";
 import RichTextEditor from "@/components/RichTextEditor/RichTextEditor";
 import SelectCreatableMulti from "@/components/SelectCreatableMulti";
 import TextField from "@/components/TextField";
-import { createUpdateBlog } from "@/lib/api";
+import { createUpdateBlog, fetchImageData } from "@/lib/api";
 import { useUser } from "@/lib/auth";
 import {
   convertObjectToFormData,
@@ -42,14 +43,6 @@ const BlogCreateUpdateModal = ({
   const checkDataValidation = (data: BlogItemProps) => {
     let status = true;
 
-    if (data?.featureImage) {
-      setErrors((prev) => ({
-        ...prev,
-        featureImageError: "Please Upload an Image",
-      }));
-      status = false;
-    }
-
     const titleValidation = validateTextInputField({
       isEmail: false,
       required: true,
@@ -66,8 +59,8 @@ const BlogCreateUpdateModal = ({
       isEmail: false,
       required: true,
       value: data.content as string,
-      minLength: 20,
-      maxLength: 1000,
+      minLength: 3,
+      maxLength: 10000,
     });
     if (contentValidation.status == false) {
       setErrors((prev) => ({
@@ -85,43 +78,19 @@ const BlogCreateUpdateModal = ({
       status = false;
     }
 
+    console.log("Validation: ", status);
+
     return status;
   };
 
-  // Function to create or update a blog
-  const {
-    mutateAsync: createUpdateBlogQuery,
-    isPending: createUpdateBlogQueryPending,
-  } = useMutation({
-    mutationFn: async (data: BlogItemProps) => {
-      const tempData = isUpdate
-        ? {
-            id: Number(data.id),
-            title: data.title!,
-            content: data.content!,
-            featureImage: data.featureImage as File,
-            tags: data.tags!,
-            state: "published",
-            userId: Number(data.userId),
-          }
-        : {
-            id: undefined,
-            title: data.title!,
-            content: data.content!,
-            featureImage: data.featureImage as File,
-            tags: data.tags!,
-            state: "published",
-            userId: Number(data.userId),
-          };
-      const response = await createUpdateBlog(tempData);
-
-      if (response["status"] == 200 || response["status"] == 201) {
-        const randomNumber = Math.floor(Math.random() * 9999) + 1;
-        setDescriptionRandomKey(randomNumber);
-        queryClient.invalidateQueries();
-      }
-    },
-  });
+  // Function to get image data using src
+  const getImageData = async (image: string) => {
+    const data = await fetchImageData(
+      "http://localhost:3000/api/uploads?resource=" + image,
+      `edited-image`
+    );
+    setFormData((prev) => ({ ...prev, images: data }));
+  };
 
   // On Component Mount useEffect Call to update formData based on isUpdate State
   useEffect(() => {
@@ -130,7 +99,6 @@ const BlogCreateUpdateModal = ({
         setFormData((prev) => ({
           ...prev,
           content: blogData.content,
-          featureImage: blogData.featureImage,
           id: blogData.id,
           slug: blogData.slug,
           state: blogData.state,
@@ -140,6 +108,7 @@ const BlogCreateUpdateModal = ({
         }));
         const randomNumber = Math.floor(Math.random() * 9999) + 1;
         setDescriptionRandomKey(randomNumber);
+        getImageData(String(blogData.featureImage));
       } else {
         setFormData((prev) => ({
           ...prev,
@@ -178,6 +147,7 @@ const BlogCreateUpdateModal = ({
               }));
               setErrors((prev) => ({ ...prev, titleError: undefined }));
             }}
+            errorText={errors.titleError}
           />
           {/* {content} */}
           <RichTextEditor
@@ -195,22 +165,25 @@ const BlogCreateUpdateModal = ({
             errorText={errors.contentError}
           />
           {/* {Feature Image} */}
-          <MultipleFileUploadCustom
-            allowedFileTypes="image/png, image/jpeg, image/jpg"
-            btnText={"Upload an Image"}
-            getFiles={async (files: any) => {
-              if (files) {
-                setFormData((prev) => ({ ...prev, featureImage: files[0] }));
-              }
-            }}
-            maxUploadSize={10}
-            maxUploadFileNumber={1}
-            clearFiles={createUpdateBlogQueryPending ? true : false}
-            showCloseButton={true}
-            className="rounded-md border border-foreground dark:border-border"
-            previewSize="xs"
-            isMultiSelected={false}
-          />
+          <div>
+            <MultipleFileUploadCustom
+              allowedFileTypes="image/png, image/jpeg, image/jpg"
+              btnText={"Upload an Image"}
+              // onLoadFiles={isUpdate ? [formData?.featureImage as File] : []}
+              getFiles={async (files: any) => {
+                if (files) {
+                  setFormData((prev) => ({ ...prev, featureImage: files[0] }));
+                }
+              }}
+              maxUploadSize={10}
+              maxUploadFileNumber={1}
+              showCloseButton={true}
+              className="rounded-md border border-foreground dark:border-border"
+              previewSize="xs"
+              isMultiSelected={false}
+            />
+            <ErrorText text={errors.featureImageError} />
+          </div>
           {/* {Tags} */}
           <SelectCreatableMulti
             placeholder={"Enter Tags"}
@@ -231,27 +204,53 @@ const BlogCreateUpdateModal = ({
             }}
             isRequired={false}
             labelProps={{ text: "Tags", className: "font-bold" }}
+            errorText={errors.tagsError}
           />
           <div className="flex w-full flex-col items-center space-y-2">
             <Button
               btnText={isUpdate ? "Update" : "Create"}
               className="w-full bg-green-500 text-white"
-              isDisabled={createUpdateBlogQueryPending ? true : false}
               clicked={async () => {
                 console.log("Form Data:", formData);
-                const formDataToSend = convertObjectToFormData({
-                  ...formData,
-                  tags: formData?.tags?.join(","),
-                });
+                if (formData && checkDataValidation(formData)) {
+                  const tempData = isUpdate
+                    ? {
+                        id: Number(formData.id),
+                        title: formData.title!,
+                        content: formData.content!,
+                        featureImage: formData.featureImage as File,
+                        tags: formData.tags!,
+                        state: "published",
+                        userId: Number(formData.userId),
+                      }
+                    : {
+                        id: undefined,
+                        title: formData.title!,
+                        content: formData.content!,
+                        featureImage: formData.featureImage as File,
+                        tags: formData.tags!,
+                        state: "published",
+                        userId: Number(formData.userId),
+                      };
+                  const formDataToSend = convertObjectToFormData({
+                    ...tempData,
+                    tags: tempData?.tags?.join(","),
+                  });
 
-                // Make the POST request using fetch
-                const response = await fetch("/api/blog/upsert", {
-                  method: "POST",
-                  body: formDataToSend,
-                  headers: {
-                    // No need to manually set the 'Content-Type' for FormData, fetch will handle it
-                  },
-                });
+                  // Make the POST request using fetch
+                  const response = await fetch("/api/blog/upsert", {
+                    method: "POST",
+                    body: formDataToSend,
+                    headers: {
+                      // No need to manually set the 'Content-Type' for FormData, fetch will handle it
+                    },
+                  });
+                  if (response["status"] == 200 || response["status"] == 201) {
+                    const randomNumber = Math.floor(Math.random() * 9999) + 1;
+                    setDescriptionRandomKey(randomNumber);
+                    queryClient.invalidateQueries();
+                  }
+                }
               }}
             />
           </div>
