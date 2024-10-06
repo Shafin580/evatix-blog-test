@@ -6,6 +6,8 @@
 
 - Stripe CLI installed in your os (https://docs.stripe.com/stripe-cli)
 
+- Please Delete the .env file after cloning the project
+
 ## Commands
 
 Please go to the project root directory and run the following commands sequentially:
